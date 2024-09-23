@@ -1,4 +1,4 @@
-**
+/**
  * @file streams-i2s-filter-i2s.ino
  * @brief Copy audio from I2S to I2S using an FIR filter
  * @author Phil Schatzmann
