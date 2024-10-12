@@ -17,7 +17,7 @@ AnalogAudioStream out;
 // copy filtered values
 FilteredStream<int16_t, float> filtered(out, channels);  // Defines the filter as BaseConverter
 BluetoothA2DPSink a2dp_sink(filtered);          // sink directly to the filter, thats all.
-StreamCopy copier(out, filtered);               // Copy filter to the DAC
+//StreamCopy copier(out, filtered);               // Copy filter to the DAC
 
 // Arduino Setup
 void setup(void) {  
@@ -41,6 +41,6 @@ void setup(void) {
 // Arduino loop
 void loop() {
 
-  copier.copy();
+  //copier.copy(); // It works perfectly without copier, because filteredStream has already an output
 
 }
