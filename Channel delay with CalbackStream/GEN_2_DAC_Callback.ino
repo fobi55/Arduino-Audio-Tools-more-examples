@@ -54,7 +54,7 @@ void shift_ch_right(int16_t arr[], size_t n, int d, uint8_t ch) {
 uint8_t sel_ch = 1;  //0: even, 1: odd
 uint8_t s_delay = 8;
 
-auto delayLch = [](uint8_t* data, size_t bytes) {
+auto delayLRch = [](uint8_t* data, size_t bytes) {
   size_t sample_count = bytes / sizeof(int16_t);
   int16_t* data16 = (int16_t*)data;
   shift_ch_right(data16, sample_count, s_delay, sel_ch);
@@ -67,7 +67,7 @@ auto delayLch = [](uint8_t* data, size_t bytes) {
 SineWaveGenerator<sound_t> sineWave(12000);     // subclass of SoundGenerator with max amplitude of 32000
 GeneratedSoundStream<sound_t> sound(sineWave);  // Stream generated from sine wave ( has no output)
 AnalogAudioStream out;                          // DAC
-CallbackStream cb(out, delayLch);               // It has output
+CallbackStream cb(out, delayLRch);              // It has output
 StreamCopy copier(cb, sound);                   // Copy sound to the CalbackStream
 
 //********************************************************************************
@@ -79,7 +79,7 @@ void setup(void) {
   pinMode(25, OUTPUT);
 
   // Open Serial
-  Serial.begin(115200);  //Somehow Serial doesn't work
+  Serial.begin(115200);  
   // change to Warning to improve the quality
   //AudioLogger::instance().begin(Serial, AudioLogger::Error);
 
@@ -89,18 +89,15 @@ void setup(void) {
   config.channels = channels;
 
   out.begin(config);
-
   cb.begin(info);
-
   sineWave.begin(channels, sample_rate, 1500);
-
 }
 
 //********************************************************************************
 
 // Arduino loop
 void loop() {
-
+  // Input
   if (Serial.available() > 0) {
     String sInput = Serial.readString();
     sInput.trim();
@@ -110,12 +107,13 @@ void loop() {
     Serial.println(sInput);
   }
 
-  copier.copy();
+  copier.copy();        // Copies sound to the CallbackStream
 }
 
 //*********************************************************************************
 
 void change_ch_delay(int chd) {
+
   switch (chd) {
     case 0:
       sel_ch = 0;
@@ -124,7 +122,10 @@ void change_ch_delay(int chd) {
       sel_ch = 1;
       break;
     default:
-      s_delay = chd;
+      if (chd <= blen) {
+        s_delay = chd;
+      }
+
       break;
   }
 }
