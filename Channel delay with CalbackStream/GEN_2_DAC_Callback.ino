@@ -27,20 +27,21 @@ int16_t samples_new[blen];
 //ch: 0 -> even, 1 -> odd
 void shift_ch_right(int16_t arr[], size_t n, int d, uint8_t ch) {
   d = d % n;  // adjust d if it's greater than n
+  int dd = 2*d;
 
   for (int i = n; i >= 0; i -= 2) {  // shift right in reversed order
 
-    if (i > n - 2 * d) {
+    if (i > n - dd) {
       // temp counts d to 0 by -1
       // read current last d samples
-      samples_new[((i - (n - 2 * d)) >> 1) - 1] = arr[i - 2 + ch];
+      samples_new[((i - 1 - (n - dd)) >> 1)] = arr[i - 2 + ch];
     }
 
-    if (i > 2 * d) {  // shift right by d samples
-      arr[i - 2 + ch] = arr[i - 2 * (d + 1) + ch];
+    if (i >= dd) {  // shift right by d samples
+      arr[i - 2 + ch] = arr[i - 2 - dd + ch];
     }
 
-    if (i < 2 * d) {
+    if (i < dd) {
       // add previous last d samples in front
       arr[i + ch] = samples_old[(i >> 1)];
       // remember current last d samples
@@ -79,7 +80,7 @@ void setup(void) {
   pinMode(25, OUTPUT);
 
   // Open Serial
-  Serial.begin(115200);  
+  Serial.begin(115200);
   // change to Warning to improve the quality
   //AudioLogger::instance().begin(Serial, AudioLogger::Error);
 
@@ -107,7 +108,7 @@ void loop() {
     Serial.println(sInput);
   }
 
-  copier.copy();        // Copies sound to the CallbackStream
+  copier.copy();  // Copies sound to the CallbackStream
 }
 
 //*********************************************************************************
